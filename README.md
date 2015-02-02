@@ -1,2 +1,2 @@
-# linguaggi_modelli_computazionali
-Repository contenente gli esercizi e la teoria relativi al corso di Linguaggi e modelli computazionali M dell'università di Bologna
+# Benvenuti
+In questo repository inserirò tutto il materiale utilizzato per la preparazione dell'esame di Linguaggi e Modelli Computazionali M della facoltà di Ingegneria dell'Università di Bologna.
