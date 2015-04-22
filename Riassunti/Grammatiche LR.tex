@@ -1,0 +1,279 @@
+\documentclass[a4paper, fleqn]{report}
+
+\usepackage[italian]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{fullpage}
+
+\pagestyle{plain}
+
+\title{Grammatiche LR}
+
+\author{Marco Moschettini}
+
+\begin{document}
+\maketitle
+
+\chapter{Riconoscitori LR(0)}
+
+\section{Introduzione}
+
+\section{Calcolo dei contesti: procedura operativa}
+Procedura passo-passo per definire l'ASF caratteristico dell'oracolo di un riconoscitore LR(0).
+
+Si adotteranno le seguenti conventzioni
+\subsection{Convenzioni}
+\begin{itemize}
+\item Ogni frase lecita è espressamente terminata dal terminatore \textbf{\$}
+\item Data una forma di frase, il cursore \textbf{.} denota il \textbf{confine} tra la parte già analizzata (sinistra) e la parte ancora da analizzare (destra)
+\end{itemize}
+
+\subsection{Procedimento}
+Prendiamo, ad esempio, la grammatica:
+\begin{gather*}
+Z \rightarrow S \$ \\
+S \rightarrow aSAB\ |\ BA \\
+A \rightarrow aA\ |\ B \\
+B \rightarrow b
+\end{gather*}
+
+All'inizio l'input è ancora tutto da leggere e ogni frase lecita deriva dallo scopo Z; quindi la situazione è schematizzabile con
+\[Z \rightarrow .S\$\]
+Poichè a destra del cursore c'è S, le frasi possono iniziare solo con produzioni di S. Ergo, per descrivere completamente questo stato occorre aggiungere \textbf{tutte le produzioni di S}:
+\begin{gather*}
+Z \rightarrow .S \$ \\
+S \rightarrow .aSAB\ |\ .BA
+\end{gather*}
+Inoltre, poichè una di queste produzioni può iniziare per B, anche \textbf{tutte le produzioni di B}:
+\[B \rightarrow .b\]
+
+A questo punto il primo stato dell'automa caratteristico, che rappresenta tutte le situazioni iniziali è descritto da questo stato (lo chiameremo \textbf{stato 1})
+
+\subsubsection{Stato 1}
+Cominciamo dallo stato iniziale:
+\begin{gather*}
+Z \rightarrow .S \$ \\
+S \rightarrow .aSAB\ |\ .BA \\
+B \rightarrow .b
+\end{gather*}
+
+Ora dobbiamo \emph{investigare} le possibili evoluzioni di questo stato, ossia \emph{spostare} il cursore a destra di una posizione \textbf{in tutti i modi possibili}:
+\begin{itemize}
+\item con input S: \(Z \rightarrow S.\$\) (\textbf{stato F})
+\item con input a: \(S \rightarrow a.SAB\) (\textbf{stato 2})
+\item con input B: \(S \rightarrow B.A\) (\textbf{stato 4})
+\item con input b: \(B \rightarrow b.\) (\textbf{stato R1})
+\end{itemize}
+dove con F intendiamo lo stato \textbf{finale} del nostro riconoscitore, con gli stati numerici degli stati in cui effettuare una \textbf{shift} con gli stati \textbf{\(R^*\)} intendiamo gli stati in cui effettuare una \textbf{reduce}.
+
+\subsubsection{Stato 2}
+A questo punto lo stato 2 ha una produzione che può iniziare per S. È, dunque, necessario considerare tutte le produzioni relative ad S; Poichè tra queste ultime una può iniziare per B, va aggiunta anche la produzione di B.
+\begin{gather*}
+S \rightarrow a.SAB \\
+S \rightarrow .aSAB\ |\ .BA \\
+B \rightarrow .b
+\end{gather*}
+Da qui dobbiamo provare tutte le possibili combinazioni di input:
+\begin{itemize}
+\item con input S: \(S \rightarrow aS.AB\) (\textbf{stato 3})
+\item con input a: \(S \rightarrow a.SAB\) (\textbf{stato 2})
+\item con input B: \(S \rightarrow B.A\) (\textbf{stato 4})
+\item con input b: \(B \rightarrow b.\) (\textbf{stato R1})
+\end{itemize}
+
+\subsubsection{Stato 4}
+Nello stato 4 compare una A e quindi dobbiamo considerare tutte le possibili produzioni di A:
+\begin{gather*}
+S \rightarrow B.A \\
+A \rightarrow .aA\ |\ .B \\
+B \rightarrow .b
+\end{gather*}
+Stesso ragionamento per il calcolo degli spostamenti:
+\begin{itemize}
+\item con input A: \(S \rightarrow BA.\) (\textbf{stato R3})
+\item con input a: \(A \rightarrow a.B\) (\textbf{stato 6})
+\item con input B: \(A \rightarrow B.\) (\textbf{stato R2})
+\item con input b: \(B \rightarrow b.\) (\textbf{stato R1})
+\end{itemize}
+
+\subsubsection{Stato 3}
+In questo caso compare una A e quindi, come sopra, dobbiamo considerare tutte le produzioni di A:
+\begin{gather*}
+S \rightarrow aS.AB \\
+A \rightarrow .aA\ |\ .B \\
+B \rightarrow .b
+\end{gather*}
+Spostamenti:
+\begin{itemize}
+\item con input A: \(S \rightarrow aSA.B\) (\textbf{stato 5})
+\item con input a: \(A \rightarrow a.A\) (\textbf{stato 6})
+\item con input B: \(A \rightarrow B.\) (\textbf{stato R2})
+\item con input b: \(B \rightarrow b.\) (\textbf{stato R1})
+\end{itemize}
+
+\subsubsection{Stato 6}
+In questo caso compare una A e quindi, ancora una volta, dobbiamo considerare tutte le produzioni di A.
+\begin{gather*}
+A \rightarrow a.A \\
+A \rightarrow .aA\ |\ .B \\
+B \rightarrow .b
+\end{gather*}
+Spostamenti:
+\begin{itemize}
+\item con input A: \(A \rightarrow aA.\) (\textbf{stato R4})
+\item con input a: \(A \rightarrow a.A\) (\textbf{stato 6})
+\item con input B: \(A \rightarrow B.\) (\textbf{stato R2})
+\item con input b: \(B \rightarrow b.\) (\textbf{stato R1})
+\end{itemize}
+
+\subsubsection{Stato 5}
+Eccoci giunti all'ultimo stato da rappresentare. In questo caso compare solo una B e quindi dobbiamo considerare tutte le produzioni di B:
+\begin{gather*}
+S \rightarrow aSA.B \\
+B \rightarrow .b
+\end{gather*}
+Spostamenti:
+\begin{itemize}
+\item con input B: \(S \rightarrow aSAB.\) (\textbf{stato R5})
+\item con input b: \(B \rightarrow b.\) (\textbf{stato R1})
+\end{itemize}
+
+\subsection{Fine procedimento}
+Arrivati a questo punto possiamo notare che l'ASF generato è deterministico, non presenta ambiguità e quindi è possibile disegnarlo ed implementare la corrispondente parsing table per l'\textbf{oracolo}. In particolare, preso l'ASF risultante:
+\begin{itemize}
+\item ogni arco corrisponde ad un'operazione \textbf{shift}.
+\item ogni stato finale corrisponde ad un'operazione \textbf{reduce}.
+\end{itemize}
+
+\subsection{Tabella di parsing}
+\begin{tabular}{|l|l| l| l |l |l |l|}
+\hline
+& a & b & \$ & S & A & B \\
+\hline
+1 & s2 & s11 & & g10 & & g4 \\
+\hline
+2 & s2 & s11 & & g3 & & g4 \\
+\hline
+3 & s6 & s11 & & & g5 & g12 \\
+\hline
+4 & s6 & s11 & & & g13 & g12 \\
+\hline
+5 & & s11 & & & & g15 \\
+\hline
+6 & s6 & & & & g14 & g4 \\
+\hline
+10 &  & & a & & & \\
+\hline
+11 & r1 & r1 & r1 & & & \\
+\hline
+12 & r2 & r2 & r2 & & & \\
+\hline
+13 & r3 & r3 & r3 & & & \\
+\hline
+14 & r4 & r4 & r4 & & & \\
+\hline
+15 & r5 & r5 & r5 & & & \\
+\hline
+\end{tabular}\newline\newline
+Con:
+\begin{itemize}
+\item 10 = stato F
+\item 11 = stato R1
+\item 12 = stato R2
+\item 13 = stato R3
+\item 14 = stato R4
+\item 15 = stato R5
+\end{itemize}
+e con:
+\begin{itemize}
+\item \(B \rightarrow b\) (riduzione 1)
+\item \(A \rightarrow B\) (riduzione 2)
+\item \(S \rightarrow BA\) (riduzione 3)
+\item \(A \rightarrow aA\) (riduzione 4)
+\item \(S \rightarrow aSAB\) (riduzione 5)
+\end{itemize}
+
+\subsection{Osservazioni}
+Nel caso si osservino dei problemi di ambiguità durante la stesura dell'ASF e il grafico corrispondente non risultasse deterministico, \textbf{il linguaggio non sarà LR(0)}.
+
+\chapter{Riconoscitori LR1(1)}
+\section{Procedura operativa}
+La procedura operativa per un linguaggio LR(1) è molto simile a quella mostrata per LR(0). L'unica aggiunta degna di nota è quella dei cosiddetti \textbf{Look Ahead symbols} che rappresentano previsioni per il prossimo carattere letto da input. 
+Prendiamo, ad esempio, la grammatica:
+\begin{gather*}
+Z \rightarrow .S \$ \quad (?)\\
+S \rightarrow .aSAB\ |\ .BA \quad (a,=)\\
+B \rightarrow .b \quad (\$)
+\end{gather*}
+I simboli tra parentesi mostrano i possibili prossimi input per la singola produzione. Come si calcola il \textbf{lookahead set}?
+
+\subsection{Calcolo del lookahead set}
+Si procede come segue:
+\begin{itemize}
+\item si guarda quali caratteri possono seguire il simbolo terminale VN nella produzione di livello superiore a quella trattata.
+\item si concatena tali caratteri con il lookahead set attuale
+\item si prende l'iniziale della stringa (perchè stiamo considerando LR(1)... si estende a k stringhe se considerassimo LR(k)).
+\end{itemize}
+Facciamo un esempio:
+\begin{gather*}
+Z \rightarrow .S \$ \quad (?)\\
+S \rightarrow .CbBa \quad (\$)\\
+C \rightarrow .a \quad (...)
+\end{gather*}
+\emph{Nota}: (\emph{?}) sta per \emph{anything} e va inserito al livello dello scopo.
+Calcoliamo ora il lookahead set per la produzione \((C \rightarrow .a)\):
+\begin{itemize}
+\item si guardano i caratteri che possono \textbf{seguire C nella produzione di livello superiore a quella usata attualmente} (in questo caso \((S \rightarrow .CbBa)\)
+\item \textbf{si concatena il risultato} con il lookahead attuale (\textbf{\$}) ottenendo (\textbf{b\$})
+\item si tiene solo il \textbf{primo carattere} (\textbf{b})
+\end{itemize}
+Si prosegue in questo modo fino a giungere all'ASF.
+
+\subsection{Osservazioni}
+Possiamo notare che questo metodo è molto più complesso del caso LR(0) perchè è necessario, ad ogni passaggio, ricomputare l'insieme dei lookahead symbols svolgendo in pratica passo per passo le stesse elaborazioni che portano alla costruzione dei contesti LR(1).
+
+Tuttavia, seppur aumentando la complessità, notiamo che con questo metodo è possibile risolvere molte ambiguità legate alla scelta di produzioni in LR(0).
+In particolare nel caso di più strade possibili con uno stesso simbolo in ingresso, sarà sufficiente analizzare i lookahead symbols per scegliere una strada piuttosto che un'altra.
+
+\chapter{Riconoscitori SLR}
+L’esperienza conferma che è praticamente impossibile costruire un parser deterministico LR(1) per un “vero” linguaggio di programmazione, poiché le sue dimensioni sarebbero intrattabili.
+Di conseguenza si utilizzano versioni semplificate di tale riconoscitore. In particolare SLR allarga leggermente la dimensione dei contesti di LR(0) riducendo aumentandone la portata ma anche esponendo i contesti a maggiore sovrapposizione (ricordiamo che nel caso di sovrapposizione dei contesti l'ASF presenterò ambiguità).
+
+\section{Procedura operativa}
+Un modo molto semplice per generare l'ASF di un riconoscitore SLR è quello di partire dal relativo riconoscitore LR(0) togliendo alcune parti della parsing table a seconda di alcune regole. Più precisamente: una riduzione del tipo
+\((A \rightarrow \alpha)\) 
+va inserita nella tabella di parsing \textbf{solo se} il prossimo simbolo appartiene a \textbf{FOLLOW(A)}. Se si ottiene un automa \textbf{senza conflitti}, allora la grammatica è SLR(1). Altrimenti, no.
+
+\chapter{Riconoscitori LALR(1)}
+E se l'approccio SLR non funziona?
+Un approccio alternativo per ridurre le dimensioni della parsing table
+consiste nel \textbf{collassare in un solo stato gli stati identici a
+meno dei simboli di Look-Ahead}. Si parla allora di parser LALR(1).
+
+\section{Procedura operativa}
+La procedura prevede di generare completamente l'ASF del parser LR(1) salvo poi collassare gli stati identici (in cui cambiano solo i lookahead sets).
+Per verificarne la correttezza bisogna garantire la totale assenza di conflitti.
+
+\section{Osservazioni}
+Esistono casi in cui un parser LALR(1) presenta gli stessi stati di un possibile parser SLR che presenta dei conflitti.
+
+\chapter{Riepilogo}
+Riepilogando abbiamo la seguente gerarchia di parser (ordinato per complessità crescente):
+\begin{enumerate}
+\item LR(0)
+\item SLR
+\item LALR(1)
+\item LR(1)
+\item LR(k)
+\end{enumerate}
+
+\section{Ulteriori considerazioni}
+\begin{itemize}
+\item Ogni grammatica SLR(k) è anche LR(k)
+\item Ogni grammatica LL(k) aumentata della produzione \((Z \rightarrow S\$)\) è anche LR(k)
+\item Esistono grammatiche LR(1) ma non SLR(k)
+\item Esistono grammatiche LL(1) ma non SLR(1)
+\end{itemize}
+
+\end{document}

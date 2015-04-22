@@ -1,0 +1,99 @@
+
+\documentclass[a4paper]{report}
+
+\usepackage[italian]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+
+\pagestyle{plain}
+
+\title{Pumping Lemma}
+
+\author{Marco Moschettini}
+
+\begin{document}
+\maketitle
+
+\chapter{Teorema}
+\section{Ipotesi}
+In un linguaggio \textit{infinito}, ogni stringa sufficientemente lunga deve avere una parte che si ripete.
+
+\section{Pumping lemma per grammatiche context-free}
+Se \textbf{L} è un linguaggio context-free, esiste un interno N tale che, per ogni stringa z di lunghezza almeno pari a N:
+\begin{itemize}
+\item z può essere riscritta come: \( z = uvwxy \quad con \left | z \right | \ge N \)
+\item la parte centrale \(vwx\) ha lunghezza limitata: \(\left | vwx \right | \le N\)
+\item v e x non sono nulle: \( \left | vx \right | \ge 1\)
+\item \emph{tutte le stringhe della forma \(uv^iwx^iy \in L\)}
+\end{itemize}
+In pratica il lemma afferma che le due sottostringhe \(v\) e \(x\) possono essere "pompate" quanto si vuole ottenendo sempre stringhe di L
+
+\section{Pumping lemma per linguaggi regolari}
+Se L è un linguaggio regolare, esiste un intero M tale che, per ogni stringa z di lunghezza almeno pari a M:
+\begin{itemize}
+\item z può essere riscritta come: \(z = xyw \quad con \left | z \right | \geq M\)
+\item la parte centrale \(xy\) ha lunghezza limitata: \( \left | xy \right | \leq M\)
+\item \(y\) non è nulla: \(\left | y \right | \ge 1\)
+\item \emph{tutte le stringhe della forma \(xy^iw \in L\)}
+\end{itemize}
+In pratica, qui il lemma afferma che la sottostringa \(y\) può essere \emph{pompata} quanto si vuole ottenendo sempre stringhe di L 
+
+
+\chapter{Esempi}
+\section{Esempio 1}
+Prendiamo in esempio un linguaggio:
+\[ L = \{a^nb^nc^n,\ n > 0 \}\]
+dimostriamo che il linguaggio \textbf{non} è context-free:
+\begin{itemize}
+\item se L fosse context-free, esisterebbe un intero N che soddisferebbe il pumping lemma; consideriamo allora la stringa \(z = a^nb^nc^n\) prendiamo ad esempio 
+\item scomponiamo z nei cinque pezzi uvwxy con \(\left | \textbf{vwx} \right | \le N\)
+\item ad esempio prendiamo \(n = 6 \rightarrow \) \textbf{z} = ``aaaaaabbbbbbccccc''
+\item prendiamo una sottostringa \textbf{vwx} di \textbf{z} al più lunga N (nel nostro caso scegliamo \(N = 5\)) = ``abbbb''.
+\item in questa stringa cosa corrisponde a v/w/x? Ci sono più possibilità:
+\begin{itemize}
+\item \textbf{v} = a, \textbf{w} = bbbb, \textbf{x} = \emph{vuota}
+\item \textbf{v} = \emph{vuota}, \textbf{w} = abbb, \textbf{x} = b
+\item ecc\dots
+\end{itemize}
+\item tra le stringhe del linguaggio, della forma \(uv^iwx^iy\) ci sono anche quelle per cui \(i = 0\) ossia in cui \textbf{v} e \textbf{x} mancano. ossia dato che \textbf{u} e \textbf{y} sono quelle scelte da noi poco fa (\textbf{u} =``aaaaa'', \textbf{vwx} = ``abbbb'', \textbf{y} = ``bbcccccc'') e che il pezzo centrale \textbf{w} può essere:
+\begin{itemize}
+\item ``bbbb''
+\item ``abbb''
+\item ``bbb''
+\item ``abb''
+\end{itemize}
+\item la stringa \textbf{uwy} (ottenuta tagliando \textbf{v} e \textbf{x}) risulta ``aaaaa'' + w + `` bbcccccc'', ovvero tutte le 6 'c' previste in fondo, ma meno "a" e/o meno "b" del necessario, perchè alcune sono state mangiate dalla sotto-stringa \textbf{vx}.
+\item di conseguenza la stringa \textbf{uwy} \textbf{non appartiene al linguaggio} violando l'ipotesi! Di conseguenza il linguaggio L \textbf{non è context free}
+\end{itemize}
+
+\section{Esempio 2}
+Prendiamo in esempio un linguaggio:
+\[ L = \{a^p, \ \text{p \textbf{primo}}\}\]
+dimostriamo che il linguaggio \textbf{non} è regolare:
+\begin{itemize}
+\item se L fosse regolare, esisterebbe un M che soddisferebbe il pumping lemma;
+\item sia P un primo \(\ge\) M + 2 (sappiamo che esiste perchè i numeri primi sono infiniti): consideriamo allora la stringa \(z = a^p\):
+\item scomponiamo z nei tre pezzi \textbf{xyw}, con \(\left | y \right | = r\); ne segue che \(\left | xw \right | = p - r\)
+\item in base al lemma, se L fosse regolare, la nuova stringa \(xy^{p-r}w\) dovrebbe anch'essa appartenere al linguaggio.
+\item peccato però che la lunghezza di tale stringa sia: \[\left | xp^{p-r}w \right | = \left | xw \right | + (p-r)\left |y\right | = (p-r) + (p-r)\left |y \right | = (p-r)(1+\left |y \right |) = \textbf{(p-r)(1-r)}\] ovvero \emph{non un numero primo}.
+\item pertanto possiamo affermare che essa non appartiene al linguaggio e dunque \textbf{esso non è regolare}.
+\end{itemize}
+
+\section{Esempio 3}
+Prendiamo in esempio un linguaggio:
+\[ L = \{0^n1^n+k\ \text{con}\ n,k>0\}\]
+dimostriamo che il linguaggio \textbf{non è regolare}.
+\begin{itemize}
+\item prendiamo n=2, k=2 da cui z = ``001111''
+\item scomponiamo in \textbf{xyw}: \textbf{x} = 0, \textbf{y} = 01, \textbf{w} = 111
+\item si deve avere che \(\forall i \in N,\ xy^iw \in L\)
+\item prendendo i = 2, abbiamo che \(xy^2w = 00101111 \notin L\)
+\item pertanto L \textbf{non è regolare}.
+\end{itemize}
+Dimostriamo ora che L è di tipo 2 trovando una grammatica che lo genera:
+\(S \rightarrow 0S1\ | 01G \\ G \rightarrow 1G \ |\ 1 \) 
+Il linguaggio è \textbf{context-free}. \newline\newline
+\(S \rightarrow aSa\ |\ X \\ X \rightarrow aX\ |\ bX\ |\ a\ |\ b \) 
+
+\end{document}
